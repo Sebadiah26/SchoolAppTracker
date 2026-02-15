@@ -1,0 +1,85 @@
+@page
+@model SchoolAppTracker.Pages.Apps.IndexModel
+@using SchoolAppTracker.Data.Data
+@{
+    ViewData["Title"] = "Applications";
+}
+
+<h1>Applications</h1>
+
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <input type="text" class="form-control" name="searchName" value="@Model.SearchName" placeholder="Search by name..." />
+    </div>
+    <div class="col-md-2">
+        <select class="form-select" name="statusFilter" asp-items="@Model.StatusOptions">
+            <option value="">All Statuses</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select class="form-select" name="categoryFilter" asp-items="@Model.CategoryOptions">
+            <option value="">All Categories</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select class="form-select" name="departmentFilter" asp-items="@Model.DepartmentOptions">
+            <option value="">All Departments</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a asp-page="/Apps/Index" class="btn btn-outline-secondary">Clear</a>
+        <a asp-page="/Apps/Create" class="btn btn-success">Add New</a>
+    </div>
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Vendor</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Approval</th>
+            <th>SSO</th>
+            <th>Contract End</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var app in Model.Applications)
+        {
+            <tr>
+                <td>@app.Name</td>
+                <td>@app.VendorName</td>
+                <td>@app.Category?.Name</td>
+                <td>
+                    <span class="badge @(app.Status switch
+                    {
+                        AppStatus.Active => "bg-success",
+                        AppStatus.Inactive => "bg-secondary",
+                        AppStatus.UnderReview => "bg-warning text-dark",
+                        AppStatus.Deprecated => "bg-danger",
+                        _ => "bg-light text-dark"
+                    })">@app.Status</span>
+                </td>
+                <td>
+                    <span class="badge @(app.ApprovalStatus switch
+                    {
+                        ApprovalStatus.Approved => "bg-success",
+                        ApprovalStatus.Pending => "bg-warning text-dark",
+                        ApprovalStatus.Denied => "bg-danger",
+                        _ => "bg-light text-dark"
+                    })">@app.ApprovalStatus</span>
+                </td>
+                <td>@(app.SsoEnabled ? "Yes" : "No")</td>
+                <td>@app.ContractEndDate?.ToString("MM/dd/yyyy")</td>
+                <td>
+                    <a asp-page="/Apps/Details" asp-route-id="@app.ID" class="btn btn-sm btn-outline-primary">Details</a>
+                    <a asp-page="/Apps/Edit" asp-route-id="@app.ID" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    <a asp-page="/Apps/Delete" asp-route-id="@app.ID" class="btn btn-sm btn-outline-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,89 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h1>Dashboard</h1>
+
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Applications</h5>
+                <p class="card-text display-6">@Model.Stats.TotalApps</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Active</h5>
+                <p class="card-text display-6">@Model.Stats.ActiveApps</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Under Review</h5>
+                <p class="card-text display-6">@Model.Stats.UnderReviewApps</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Pending Approval</h5>
+                <p class="card-text display-6">@Model.Stats.PendingApproval</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-md-3">
+        <div class="card text-white bg-secondary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Inactive</h5>
+                <p class="card-text display-6">@Model.Stats.InactiveApps</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-danger mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Deprecated</h5>
+                <p class="card-text display-6">@Model.Stats.DeprecatedApps</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.Stats.ExpiringContracts.Any())
+{
+    <div class="mt-4">
+        <h3>Contracts Expiring Within 30 Days</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Application</th>
+                    <th>Contract End Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var contract in Model.Stats.ExpiringContracts)
+                {
+                    <tr>
+                        <td>@contract.ApplicationName</td>
+                        <td>@contract.ContractEndDate?.ToString("MM/dd/yyyy")</td>
+                        <td>
+                            <a asp-page="/Apps/Details" asp-route-id="@contract.ApplicationId" class="btn btn-sm btn-outline-primary">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

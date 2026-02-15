@@ -1,0 +1,57 @@
+@page
+@model SchoolAppTracker.Pages.Categories.IndexModel
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<h1>Categories</h1>
+
+<form method="post" asp-page-handler="Create" class="row g-3 mb-4">
+    <div class="col-md-4">
+        <input type="text" class="form-control" name="name" placeholder="New category name..." required />
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-success">Add Category</button>
+    </div>
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var category in Model.Categories)
+        {
+            <tr>
+                <td>
+                    @if (Model.EditId == category.ID)
+                    {
+                        <form method="post" asp-page-handler="Update" class="d-flex">
+                            <input type="hidden" name="id" value="@category.ID" />
+                            <input type="text" class="form-control form-control-sm me-2" name="name" value="@category.Name" required />
+                            <button type="submit" class="btn btn-sm btn-primary me-1">Save</button>
+                            <a asp-page="/Categories/Index" class="btn btn-sm btn-outline-secondary">Cancel</a>
+                        </form>
+                    }
+                    else
+                    {
+                        @category.Name
+                    }
+                </td>
+                <td>
+                    @if (Model.EditId != category.ID)
+                    {
+                        <a asp-page="/Categories/Index" asp-route-editId="@category.ID" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <form method="post" asp-page-handler="Delete" class="d-inline">
+                            <input type="hidden" name="id" value="@category.ID" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this category?')">Delete</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

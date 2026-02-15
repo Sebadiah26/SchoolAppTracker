@@ -1,0 +1,194 @@
+@page "{id:int}"
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using SchoolAppTracker.Data.Data
+@model SchoolAppTracker.Pages.Apps.EditModel
+@{
+    ViewData["Title"] = "Edit Application";
+    var categoryOptions = (SelectList)ViewData["CategoryOptions"]!;
+    var statusOptions = (SelectList)ViewData["StatusOptions"]!;
+    var approvalStatusOptions = (SelectList)ViewData["ApprovalStatusOptions"]!;
+    var departments = (List<Department>)ViewData["Departments"]!;
+    var gradeLevels = (List<GradeLevel>)ViewData["GradeLevels"]!;
+    var selectedDepartmentIds = (List<int>)ViewData["SelectedDepartmentIds"]!;
+    var selectedGradeLevelIds = (List<int>)ViewData["SelectedGradeLevelIds"]!;
+}
+
+<h1>Edit Application</h1>
+
+<form method="post">
+    <input type="hidden" asp-for="Application.ID" />
+    <input type="hidden" asp-for="Application.CreatedDate" />
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-3">
+                <div class="card-header"><strong>General Information</strong></div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="Application.Name" class="form-label"></label>
+                        <input asp-for="Application.Name" class="form-control" />
+                        <span asp-validation-for="Application.Name" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Application.Description" class="form-label"></label>
+                        <textarea asp-for="Application.Description" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Application.VendorName" class="form-label"></label>
+                            <input asp-for="Application.VendorName" class="form-control" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Application.VendorContact" class="form-label"></label>
+                            <input asp-for="Application.VendorContact" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Application.WebsiteUrl" class="form-label"></label>
+                        <input asp-for="Application.WebsiteUrl" class="form-control" />
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Application.CategoryId" class="form-label">Category</label>
+                            <select asp-for="Application.CategoryId" class="form-select" asp-items="categoryOptions">
+                                <option value="">-- Select --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Application.Status" class="form-label"></label>
+                            <select asp-for="Application.Status" class="form-select" asp-items="statusOptions"></select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Application.ApprovalStatus" class="form-label"></label>
+                            <select asp-for="Application.ApprovalStatus" class="form-select" asp-items="approvalStatusOptions"></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header"><strong>Compliance & SSO</strong></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check">
+                                <input asp-for="Application.SsoEnabled" class="form-check-input" />
+                                <label asp-for="Application.SsoEnabled" class="form-check-label"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-8 mb-3">
+                            <label asp-for="Application.SsoProvider" class="form-label"></label>
+                            <input asp-for="Application.SsoProvider" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check">
+                                <input asp-for="Application.FerpaCompliant" class="form-check-input" />
+                                <label asp-for="Application.FerpaCompliant" class="form-check-label"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check">
+                                <input asp-for="Application.CoppaCompliant" class="form-check-input" />
+                                <label asp-for="Application.CoppaCompliant" class="form-check-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Application.DataPrivacyAgreementUrl" class="form-label"></label>
+                        <input asp-for="Application.DataPrivacyAgreementUrl" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header"><strong>Contract & Licensing</strong></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Application.ContractStartDate" class="form-label"></label>
+                            <input asp-for="Application.ContractStartDate" type="date" class="form-control" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Application.ContractEndDate" class="form-label"></label>
+                            <input asp-for="Application.ContractEndDate" type="date" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Application.AnnualCost" class="form-label"></label>
+                            <input asp-for="Application.AnnualCost" class="form-control" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Application.LicenseType" class="form-label"></label>
+                            <input asp-for="Application.LicenseType" class="form-control" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Application.NumberOfLicenses" class="form-label"></label>
+                            <input asp-for="Application.NumberOfLicenses" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header"><strong>Approval</strong></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Application.ApprovedBy" class="form-label"></label>
+                            <input asp-for="Application.ApprovedBy" class="form-control" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Application.ApprovedDate" class="form-label"></label>
+                            <input asp-for="Application.ApprovedDate" type="date" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header"><strong>Departments</strong></div>
+                <div class="card-body">
+                    @foreach (var dept in departments)
+                    {
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="SelectedDepartmentIds" value="@dept.ID"
+                                   @(selectedDepartmentIds.Contains(dept.ID) ? "checked" : "") />
+                            <label class="form-check-label">@dept.Name</label>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header"><strong>Grade Levels</strong></div>
+                <div class="card-body">
+                    @foreach (var gl in gradeLevels)
+                    {
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="SelectedGradeLevelIds" value="@gl.ID"
+                                   @(selectedGradeLevelIds.Contains(gl.ID) ? "checked" : "") />
+                            <label class="form-check-label">@gl.Name</label>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Application.Notes" class="form-label"></label>
+                <textarea asp-for="Application.Notes" class="form-control" rows="3"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a asp-page="/Apps/Details" asp-route-id="@Model.Application.ID" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
