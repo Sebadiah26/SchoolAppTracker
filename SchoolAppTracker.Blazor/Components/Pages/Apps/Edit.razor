@@ -1,0 +1,255 @@
+@page "/apps/{Id:int}/edit"
+@inject IApplicationService AppService
+@inject ICategoryService CategoryService
+@inject IDepartmentService DepartmentService
+@inject NavigationManager Nav
+@using Microsoft.EntityFrameworkCore
+@inject SchoolAppTracker.Data.SchoolAppTrackerContext Context
+@rendermode InteractiveServer
+
+<PageTitle>Edit Application</PageTitle>
+
+<h1>Edit Application</h1>
+
+@if (app == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <EditForm Model="app" OnValidSubmit="HandleSubmit" FormName="EditApp">
+        <DataAnnotationsValidator />
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-3">
+                    <div class="card-header"><strong>General Information</strong></div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <InputText class="form-control" @bind-Value="app.Name" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <InputTextArea class="form-control" @bind-Value="app.Description" rows="3" />
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Vendor Name</label>
+                                <InputText class="form-control" @bind-Value="app.VendorName" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Vendor Contact</label>
+                                <InputText class="form-control" @bind-Value="app.VendorContact" />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Website URL</label>
+                            <InputText class="form-control" @bind-Value="app.WebsiteUrl" />
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Category</label>
+                                <InputSelect class="form-select" @bind-Value="app.CategoryId">
+                                    <option value="">-- Select --</option>
+                                    @foreach (var c in categories)
+                                    {
+                                        <option value="@c.ID">@c.Name</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Status</label>
+                                <InputSelect class="form-select" @bind-Value="app.Status">
+                                    @foreach (var s in Enum.GetValues<AppStatus>())
+                                    {
+                                        <option value="@s">@s</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Approval Status</label>
+                                <InputSelect class="form-select" @bind-Value="app.ApprovalStatus">
+                                    @foreach (var s in Enum.GetValues<ApprovalStatus>())
+                                    {
+                                        <option value="@s">@s</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header"><strong>Compliance & SSO</strong></div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    <InputCheckbox class="form-check-input" @bind-Value="app.SsoEnabled" />
+                                    <label class="form-check-label">SSO Enabled</label>
+                                </div>
+                            </div>
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">SSO Provider</label>
+                                <InputText class="form-control" @bind-Value="app.SsoProvider" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    <InputCheckbox class="form-check-input" @bind-Value="app.FerpaCompliant" />
+                                    <label class="form-check-label">FERPA Compliant</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    <InputCheckbox class="form-check-input" @bind-Value="app.CoppaCompliant" />
+                                    <label class="form-check-label">COPPA Compliant</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Data Privacy Agreement URL</label>
+                            <InputText class="form-control" @bind-Value="app.DataPrivacyAgreementUrl" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header"><strong>Contract & Licensing</strong></div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Contract Start Date</label>
+                                <InputDate class="form-control" @bind-Value="app.ContractStartDate" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Contract End Date</label>
+                                <InputDate class="form-control" @bind-Value="app.ContractEndDate" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Annual Cost</label>
+                                <InputNumber class="form-control" @bind-Value="app.AnnualCost" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">License Type</label>
+                                <InputText class="form-control" @bind-Value="app.LicenseType" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Number of Licenses</label>
+                                <InputNumber class="form-control" @bind-Value="app.NumberOfLicenses" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header"><strong>Approval</strong></div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Approved By</label>
+                                <InputText class="form-control" @bind-Value="app.ApprovedBy" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Approved Date</label>
+                                <InputDate class="form-control" @bind-Value="app.ApprovedDate" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header"><strong>Departments</strong></div>
+                    <div class="card-body">
+                        @foreach (var dept in departments)
+                        {
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" checked="@selectedDeptIds.Contains(dept.ID)"
+                                       @onchange="e => ToggleDept(dept.ID, (bool)e.Value!)" />
+                                <label class="form-check-label">@dept.Name</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header"><strong>Grade Levels</strong></div>
+                    <div class="card-body">
+                        @foreach (var gl in gradeLevels)
+                        {
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" checked="@selectedGradeIds.Contains(gl.ID)"
+                                       @onchange="e => ToggleGrade(gl.ID, (bool)e.Value!)" />
+                                <label class="form-check-label">@gl.Name</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Notes</label>
+                    <InputTextArea class="form-control" @bind-Value="app.Notes" rows="3" />
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a href="/apps/@Id" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Application? app;
+    private List<Category> categories = new();
+    private List<Department> departments = new();
+    private List<GradeLevel> gradeLevels = new();
+    private HashSet<int> selectedDeptIds = new();
+    private HashSet<int> selectedGradeIds = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        app = await AppService.GetByIdAsync(Id);
+        if (app != null)
+        {
+            selectedDeptIds = app.ApplicationDepartments.Select(ad => ad.DepartmentId).ToHashSet();
+            selectedGradeIds = app.ApplicationGradeLevels.Select(ag => ag.GradeLevelId).ToHashSet();
+        }
+        categories = await CategoryService.GetAllAsync();
+        departments = await DepartmentService.GetAllAsync();
+        gradeLevels = await Context.GradeLevels.OrderBy(g => g.ID).ToListAsync();
+    }
+
+    private void ToggleDept(int id, bool selected)
+    {
+        if (selected) selectedDeptIds.Add(id); else selectedDeptIds.Remove(id);
+    }
+
+    private void ToggleGrade(int id, bool selected)
+    {
+        if (selected) selectedGradeIds.Add(id); else selectedGradeIds.Remove(id);
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (app == null) return;
+
+        var existingDepts = await Context.ApplicationDepartments.Where(ad => ad.ApplicationId == app.ID).ToListAsync();
+        var existingGrades = await Context.ApplicationGradeLevels.Where(ag => ag.ApplicationId == app.ID).ToListAsync();
+        Context.ApplicationDepartments.RemoveRange(existingDepts);
+        Context.ApplicationGradeLevels.RemoveRange(existingGrades);
+        await Context.SaveChangesAsync();
+
+        app.ApplicationDepartments = selectedDeptIds.Select(id => new ApplicationDepartment { ApplicationId = app.ID, DepartmentId = id }).ToList();
+        app.ApplicationGradeLevels = selectedGradeIds.Select(id => new ApplicationGradeLevel { ApplicationId = app.ID, GradeLevelId = id }).ToList();
+
+        await AppService.UpdateAsync(app);
+        Nav.NavigateTo($"/apps/{Id}");
+    }
+}

@@ -1,0 +1,129 @@
+@page "/apps"
+@inject IApplicationService AppService
+@inject ICategoryService CategoryService
+@inject IDepartmentService DepartmentService
+@rendermode InteractiveServer
+
+<PageTitle>Applications</PageTitle>
+
+<h1>Applications</h1>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <input type="text" class="form-control" placeholder="Search by name..." @bind="searchName" @bind:event="oninput" />
+    </div>
+    <div class="col-md-2">
+        <select class="form-select" @bind="statusFilter">
+            <option value="">All Statuses</option>
+            @foreach (var s in Enum.GetValues<AppStatus>())
+            {
+                <option value="@s">@s</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select class="form-select" @bind="categoryFilter">
+            <option value="">All Categories</option>
+            @foreach (var c in categories)
+            {
+                <option value="@c.ID">@c.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select class="form-select" @bind="departmentFilter">
+            <option value="">All Departments</option>
+            @foreach (var d in departments)
+            {
+                <option value="@d.ID">@d.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-primary" @onclick="Search">Search</button>
+        <button class="btn btn-outline-secondary" @onclick="Clear">Clear</button>
+        <a href="/apps/create" class="btn btn-success">Add New</a>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Vendor</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Approval</th>
+            <th>SSO</th>
+            <th>Contract End</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var app in applications)
+        {
+            <tr>
+                <td>@app.Name</td>
+                <td>@app.VendorName</td>
+                <td>@app.Category?.Name</td>
+                <td><span class="badge @StatusBadge(app.Status)">@app.Status</span></td>
+                <td><span class="badge @ApprovalBadge(app.ApprovalStatus)">@app.ApprovalStatus</span></td>
+                <td>@(app.SsoEnabled ? "Yes" : "No")</td>
+                <td>@app.ContractEndDate?.ToString("MM/dd/yyyy")</td>
+                <td>
+                    <a href="/apps/@app.ID" class="btn btn-sm btn-outline-primary">Details</a>
+                    <a href="/apps/@app.ID/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    <a href="/apps/@app.ID/delete" class="btn btn-sm btn-outline-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<Application> applications = new();
+    private List<Category> categories = new();
+    private List<Department> departments = new();
+    private string? searchName;
+    private AppStatus? statusFilter;
+    private int? categoryFilter;
+    private int? departmentFilter;
+
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await CategoryService.GetAllAsync();
+        departments = await DepartmentService.GetAllAsync();
+        applications = await AppService.GetAllAsync();
+    }
+
+    private async Task Search()
+    {
+        applications = await AppService.SearchAsync(searchName, statusFilter, categoryFilter, departmentFilter);
+    }
+
+    private async Task Clear()
+    {
+        searchName = null;
+        statusFilter = null;
+        categoryFilter = null;
+        departmentFilter = null;
+        applications = await AppService.GetAllAsync();
+    }
+
+    private string StatusBadge(AppStatus status) => status switch
+    {
+        AppStatus.Active => "bg-success",
+        AppStatus.Inactive => "bg-secondary",
+        AppStatus.UnderReview => "bg-warning text-dark",
+        AppStatus.Deprecated => "bg-danger",
+        _ => "bg-light text-dark"
+    };
+
+    private string ApprovalBadge(ApprovalStatus status) => status switch
+    {
+        ApprovalStatus.Approved => "bg-success",
+        ApprovalStatus.Pending => "bg-warning text-dark",
+        ApprovalStatus.Denied => "bg-danger",
+        _ => "bg-light text-dark"
+    };
+}

@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="SchoolAppTracker.Blazor/SchoolAppTracker.Blazor.csproj" />
   <Project Path="SchoolAppTracker.Core/SchoolAppTracker.Core.csproj" />
   <Project Path="SchoolAppTracker.Data/SchoolAppTracker.Data.csproj" />
   <Project Path="SchoolAppTracker/SchoolAppTracker.csproj" />

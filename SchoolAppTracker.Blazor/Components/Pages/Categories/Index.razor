@@ -1,0 +1,104 @@
+@page "/categories"
+@inject ICategoryService CategoryService
+@rendermode InteractiveServer
+
+<PageTitle>Categories</PageTitle>
+
+<h1>Categories</h1>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <input type="text" class="form-control" placeholder="New category name..." @bind="newName" />
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-success" @onclick="Add">Add Category</button>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var category in categories)
+        {
+            <tr>
+                <td>
+                    @if (editId == category.ID)
+                    {
+                        <div class="d-flex">
+                            <input type="text" class="form-control form-control-sm me-2" @bind="editName" />
+                            <button class="btn btn-sm btn-primary me-1" @onclick="SaveEdit">Save</button>
+                            <button class="btn btn-sm btn-outline-secondary" @onclick="CancelEdit">Cancel</button>
+                        </div>
+                    }
+                    else
+                    {
+                        @category.Name
+                    }
+                </td>
+                <td>
+                    @if (editId != category.ID)
+                    {
+                        <button class="btn btn-sm btn-outline-secondary" @onclick="() => StartEdit(category)">Edit</button>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(category.ID)">Delete</button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<Category> categories = new();
+    private string newName = "";
+    private int? editId;
+    private string editName = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await CategoryService.GetAllAsync();
+    }
+
+    private async Task Add()
+    {
+        if (!string.IsNullOrWhiteSpace(newName))
+        {
+            await CategoryService.CreateAsync(new Category { Name = newName });
+            newName = "";
+            categories = await CategoryService.GetAllAsync();
+        }
+    }
+
+    private void StartEdit(Category category)
+    {
+        editId = category.ID;
+        editName = category.Name;
+    }
+
+    private void CancelEdit() => editId = null;
+
+    private async Task SaveEdit()
+    {
+        if (editId.HasValue && !string.IsNullOrWhiteSpace(editName))
+        {
+            var category = await CategoryService.GetByIdAsync(editId.Value);
+            if (category != null)
+            {
+                category.Name = editName;
+                await CategoryService.UpdateAsync(category);
+            }
+            editId = null;
+            categories = await CategoryService.GetAllAsync();
+        }
+    }
+
+    private async Task Delete(int id)
+    {
+        await CategoryService.DeleteAsync(id);
+        categories = await CategoryService.GetAllAsync();
+    }
+}

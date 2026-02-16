@@ -1,0 +1,104 @@
+@page "/departments"
+@inject IDepartmentService DepartmentService
+@rendermode InteractiveServer
+
+<PageTitle>Departments</PageTitle>
+
+<h1>Departments</h1>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <input type="text" class="form-control" placeholder="New department name..." @bind="newName" />
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-success" @onclick="Add">Add Department</button>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var department in departments)
+        {
+            <tr>
+                <td>
+                    @if (editId == department.ID)
+                    {
+                        <div class="d-flex">
+                            <input type="text" class="form-control form-control-sm me-2" @bind="editName" />
+                            <button class="btn btn-sm btn-primary me-1" @onclick="SaveEdit">Save</button>
+                            <button class="btn btn-sm btn-outline-secondary" @onclick="CancelEdit">Cancel</button>
+                        </div>
+                    }
+                    else
+                    {
+                        @department.Name
+                    }
+                </td>
+                <td>
+                    @if (editId != department.ID)
+                    {
+                        <button class="btn btn-sm btn-outline-secondary" @onclick="() => StartEdit(department)">Edit</button>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(department.ID)">Delete</button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<Department> departments = new();
+    private string newName = "";
+    private int? editId;
+    private string editName = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        departments = await DepartmentService.GetAllAsync();
+    }
+
+    private async Task Add()
+    {
+        if (!string.IsNullOrWhiteSpace(newName))
+        {
+            await DepartmentService.CreateAsync(new Department { Name = newName });
+            newName = "";
+            departments = await DepartmentService.GetAllAsync();
+        }
+    }
+
+    private void StartEdit(Department department)
+    {
+        editId = department.ID;
+        editName = department.Name;
+    }
+
+    private void CancelEdit() => editId = null;
+
+    private async Task SaveEdit()
+    {
+        if (editId.HasValue && !string.IsNullOrWhiteSpace(editName))
+        {
+            var department = await DepartmentService.GetByIdAsync(editId.Value);
+            if (department != null)
+            {
+                department.Name = editName;
+                await DepartmentService.UpdateAsync(department);
+            }
+            editId = null;
+            departments = await DepartmentService.GetAllAsync();
+        }
+    }
+
+    private async Task Delete(int id)
+    {
+        await DepartmentService.DeleteAsync(id);
+        departments = await DepartmentService.GetAllAsync();
+    }
+}

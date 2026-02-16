@@ -1,0 +1,147 @@
+@page "/apps/{Id:int}"
+@inject IApplicationService AppService
+@rendermode InteractiveServer
+
+<PageTitle>Application Details</PageTitle>
+
+@if (app == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <h1>@app.Name</h1>
+
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card mb-3">
+                <div class="card-header"><strong>General Information</strong></div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Description</dt>
+                        <dd class="col-sm-8">@(app.Description ?? "N/A")</dd>
+                        <dt class="col-sm-4">Vendor</dt>
+                        <dd class="col-sm-8">@(app.VendorName ?? "N/A")</dd>
+                        <dt class="col-sm-4">Vendor Contact</dt>
+                        <dd class="col-sm-8">@(app.VendorContact ?? "N/A")</dd>
+                        <dt class="col-sm-4">Website</dt>
+                        <dd class="col-sm-8">@(app.WebsiteUrl ?? "N/A")</dd>
+                        <dt class="col-sm-4">Category</dt>
+                        <dd class="col-sm-8">@(app.Category?.Name ?? "N/A")</dd>
+                        <dt class="col-sm-4">Status</dt>
+                        <dd class="col-sm-8"><span class="badge @StatusBadge(app.Status)">@app.Status</span></dd>
+                        <dt class="col-sm-4">Approval Status</dt>
+                        <dd class="col-sm-8"><span class="badge @ApprovalBadge(app.ApprovalStatus)">@app.ApprovalStatus</span></dd>
+                        <dt class="col-sm-4">Approved By</dt>
+                        <dd class="col-sm-8">@(app.ApprovedBy ?? "N/A")</dd>
+                        <dt class="col-sm-4">Approved Date</dt>
+                        <dd class="col-sm-8">@(app.ApprovedDate?.ToString("MM/dd/yyyy") ?? "N/A")</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header"><strong>Compliance & SSO</strong></div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">SSO Enabled</dt>
+                        <dd class="col-sm-8">@(app.SsoEnabled ? "Yes" : "No")</dd>
+                        <dt class="col-sm-4">SSO Provider</dt>
+                        <dd class="col-sm-8">@(app.SsoProvider ?? "N/A")</dd>
+                        <dt class="col-sm-4">FERPA Compliant</dt>
+                        <dd class="col-sm-8">@(app.FerpaCompliant ? "Yes" : "No")</dd>
+                        <dt class="col-sm-4">COPPA Compliant</dt>
+                        <dd class="col-sm-8">@(app.CoppaCompliant ? "Yes" : "No")</dd>
+                        <dt class="col-sm-4">Data Privacy Agreement</dt>
+                        <dd class="col-sm-8">@(app.DataPrivacyAgreementUrl ?? "N/A")</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header"><strong>Contract & Licensing</strong></div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Contract Start</dt>
+                        <dd class="col-sm-8">@(app.ContractStartDate?.ToString("MM/dd/yyyy") ?? "N/A")</dd>
+                        <dt class="col-sm-4">Contract End</dt>
+                        <dd class="col-sm-8">@(app.ContractEndDate?.ToString("MM/dd/yyyy") ?? "N/A")</dd>
+                        <dt class="col-sm-4">Annual Cost</dt>
+                        <dd class="col-sm-8">@(app.AnnualCost?.ToString("C") ?? "N/A")</dd>
+                        <dt class="col-sm-4">License Type</dt>
+                        <dd class="col-sm-8">@(app.LicenseType ?? "N/A")</dd>
+                        <dt class="col-sm-4">Number of Licenses</dt>
+                        <dd class="col-sm-8">@(app.NumberOfLicenses?.ToString() ?? "N/A")</dd>
+                    </dl>
+                </div>
+            </div>
+
+            @if (app.ApplicationDepartments.Any())
+            {
+                <div class="card mb-3">
+                    <div class="card-header"><strong>Departments</strong></div>
+                    <div class="card-body">
+                        @foreach (var dept in app.ApplicationDepartments)
+                        {
+                            <span class="badge bg-info me-1">@dept.Department.Name</span>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (app.ApplicationGradeLevels.Any())
+            {
+                <div class="card mb-3">
+                    <div class="card-header"><strong>Grade Levels</strong></div>
+                    <div class="card-body">
+                        @foreach (var gl in app.ApplicationGradeLevels)
+                        {
+                            <span class="badge bg-info me-1">@gl.GradeLevel.Name</span>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(app.Notes))
+            {
+                <div class="card mb-3">
+                    <div class="card-header"><strong>Notes</strong></div>
+                    <div class="card-body">@app.Notes</div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a href="/apps/@app.ID/edit" class="btn btn-primary">Edit</a>
+        <a href="/apps/@app.ID/delete" class="btn btn-danger">Delete</a>
+        <a href="/apps" class="btn btn-outline-secondary">Back to List</a>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Application? app;
+
+    protected override async Task OnInitializedAsync()
+    {
+        app = await AppService.GetByIdAsync(Id);
+    }
+
+    private string StatusBadge(AppStatus status) => status switch
+    {
+        AppStatus.Active => "bg-success",
+        AppStatus.Inactive => "bg-secondary",
+        AppStatus.UnderReview => "bg-warning text-dark",
+        AppStatus.Deprecated => "bg-danger",
+        _ => "bg-light text-dark"
+    };
+
+    private string ApprovalBadge(ApprovalStatus status) => status switch
+    {
+        ApprovalStatus.Approved => "bg-success",
+        ApprovalStatus.Pending => "bg-warning text-dark",
+        ApprovalStatus.Denied => "bg-danger",
+        _ => "bg-light text-dark"
+    };
+}
