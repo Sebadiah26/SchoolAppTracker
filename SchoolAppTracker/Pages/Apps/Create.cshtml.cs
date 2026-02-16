@@ -67,6 +67,7 @@ public class CreateModel : PageModel
         ViewData["CategoryOptions"] = new SelectList(categories, "ID", "Name");
         ViewData["StatusOptions"] = new SelectList(Enum.GetValues<AppStatus>().Select(s => new { Value = (int)s, Text = s.ToString() }), "Value", "Text");
         ViewData["ApprovalStatusOptions"] = new SelectList(Enum.GetValues<ApprovalStatus>().Select(s => new { Value = (int)s, Text = s.ToString() }), "Value", "Text");
+        ViewData["RosteringMethodOptions"] = new SelectList(Enum.GetValues<RosteringMethod>().Select(s => new { Value = (int)s, Text = s.ToString() }), "Value", "Text");
         ViewData["Departments"] = departments;
         ViewData["GradeLevels"] = gradeLevels;
         ViewData["SelectedDepartmentIds"] = SelectedDepartmentIds;

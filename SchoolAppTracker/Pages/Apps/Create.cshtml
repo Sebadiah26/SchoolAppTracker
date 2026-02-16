@@ -7,6 +7,7 @@
     var categoryOptions = (SelectList)ViewData["CategoryOptions"]!;
     var statusOptions = (SelectList)ViewData["StatusOptions"]!;
     var approvalStatusOptions = (SelectList)ViewData["ApprovalStatusOptions"]!;
+    var rosteringMethodOptions = (SelectList)ViewData["RosteringMethodOptions"]!;
     var departments = (List<Department>)ViewData["Departments"]!;
     var gradeLevels = (List<GradeLevel>)ViewData["GradeLevels"]!;
     var selectedDepartmentIds = (List<int>)ViewData["SelectedDepartmentIds"]!;
@@ -59,6 +60,16 @@
                             <label asp-for="Application.ApprovalStatus" class="form-label"></label>
                             <select asp-for="Application.ApprovalStatus" class="form-select" asp-items="approvalStatusOptions"></select>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header"><strong>Rostering</strong></div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="Application.RosteringMethod" class="form-label"></label>
+                        <select asp-for="Application.RosteringMethod" class="form-select" asp-items="rosteringMethodOptions"></select>
                     </div>
                 </div>
             </div>

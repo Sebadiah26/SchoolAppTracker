@@ -17,6 +17,8 @@ public class Application
     public int? CategoryId { get; set; }
     public Category? Category { get; set; }
 
+    public RosteringMethod RosteringMethod { get; set; } = RosteringMethod.None;
+
     public bool SsoEnabled { get; set; }
     public string? SsoProvider { get; set; }
     public bool FerpaCompliant { get; set; }
