@@ -41,6 +41,8 @@
             <th>Category</th>
             <th>Status</th>
             <th>Approval</th>
+            <th>Rostering</th>
+            <th>Grade Levels</th>
             <th>SSO</th>
             <th>Contract End</th>
             <th></th>
@@ -71,6 +73,13 @@
                         ApprovalStatus.Denied => "bg-danger",
                         _ => "bg-light text-dark"
                     })">@app.ApprovalStatus</span>
+                </td>
+                <td>@app.RosteringMethod</td>
+                <td>
+                    @foreach (var gl in app.ApplicationGradeLevels)
+                    {
+                        <span class="badge bg-info me-1">@gl.GradeLevel.Name</span>
+                    }
                 </td>
                 <td>@(app.SsoEnabled ? "Yes" : "No")</td>
                 <td>@app.ContractEndDate?.ToString("MM/dd/yyyy")</td>
