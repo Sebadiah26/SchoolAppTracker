@@ -67,6 +67,12 @@
                 <dl class="row">
                     <dt class="col-sm-4">Rostering Method</dt>
                     <dd class="col-sm-8">@Model.Application.RosteringMethod</dd>
+                    <dt class="col-sm-4">Roster Students</dt>
+                    <dd class="col-sm-8">@(Model.Application.RosterStudents ? "Yes" : "No")</dd>
+                    <dt class="col-sm-4">Roster Teachers</dt>
+                    <dd class="col-sm-8">@(Model.Application.RosterTeachers ? "Yes" : "No")</dd>
+                    <dt class="col-sm-4">Roster Guardians</dt>
+                    <dd class="col-sm-8">@(Model.Application.RosterGuardians ? "Yes" : "No")</dd>
                 </dl>
             </div>
         </div>

@@ -49,6 +49,12 @@ else
                     <dl class="row">
                         <dt class="col-sm-4">Rostering Method</dt>
                         <dd class="col-sm-8">@app.RosteringMethod</dd>
+                        <dt class="col-sm-4">Roster Students</dt>
+                        <dd class="col-sm-8">@(app.RosterStudents ? "Yes" : "No")</dd>
+                        <dt class="col-sm-4">Roster Teachers</dt>
+                        <dd class="col-sm-8">@(app.RosterTeachers ? "Yes" : "No")</dd>
+                        <dt class="col-sm-4">Roster Guardians</dt>
+                        <dd class="col-sm-8">@(app.RosterGuardians ? "Yes" : "No")</dd>
                     </dl>
                 </div>
             </div>

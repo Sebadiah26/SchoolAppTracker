@@ -18,6 +18,9 @@ public class Application
     public Category? Category { get; set; }
 
     public RosteringMethod RosteringMethod { get; set; } = RosteringMethod.None;
+    public bool RosterStudents { get; set; }
+    public bool RosterTeachers { get; set; }
+    public bool RosterGuardians { get; set; }
 
     public bool SsoEnabled { get; set; }
     public string? SsoProvider { get; set; }

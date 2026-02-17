@@ -92,6 +92,26 @@ else
                                 }
                             </InputSelect>
                         </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    <InputCheckbox class="form-check-input" @bind-Value="app.RosterStudents" />
+                                    <label class="form-check-label">Roster Students</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    <InputCheckbox class="form-check-input" @bind-Value="app.RosterTeachers" />
+                                    <label class="form-check-label">Roster Teachers</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    <InputCheckbox class="form-check-input" @bind-Value="app.RosterGuardians" />
+                                    <label class="form-check-label">Roster Guardians</label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

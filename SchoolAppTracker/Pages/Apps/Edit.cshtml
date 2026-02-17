@@ -74,6 +74,26 @@
                         <label asp-for="Application.RosteringMethod" class="form-label"></label>
                         <select asp-for="Application.RosteringMethod" class="form-select" asp-items="rosteringMethodOptions"></select>
                     </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check">
+                                <input asp-for="Application.RosterStudents" class="form-check-input" />
+                                <label asp-for="Application.RosterStudents" class="form-check-label"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check">
+                                <input asp-for="Application.RosterTeachers" class="form-check-input" />
+                                <label asp-for="Application.RosterTeachers" class="form-check-label"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check">
+                                <input asp-for="Application.RosterGuardians" class="form-check-input" />
+                                <label asp-for="Application.RosterGuardians" class="form-check-label"></label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
