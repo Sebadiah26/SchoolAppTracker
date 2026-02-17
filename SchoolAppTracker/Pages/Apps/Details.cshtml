@@ -149,6 +149,52 @@
                 <div class="card-body">@Model.Application.Notes</div>
             </div>
         }
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>Screenshots</strong>
+                <span class="badge bg-secondary">@Model.Application.Screenshots.Count</span>
+            </div>
+            <div class="card-body">
+                @if (Model.Application.Screenshots.Any())
+                {
+                    <div class="row">
+                        @foreach (var screenshot in Model.Application.Screenshots)
+                        {
+                            <div class="col-md-4 mb-3">
+                                <div class="card">
+                                    <img src="@screenshot.FilePath" class="card-img-top" alt="@screenshot.FileName" />
+                                    <div class="card-body p-2">
+                                        <small class="text-muted">@screenshot.FileName (@(screenshot.FileSize / 1024) KB)</small>
+                                        <form method="post" asp-page-handler="DeleteScreenshot" asp-route-id="@Model.Application.ID" class="mt-1">
+                                            <input type="hidden" name="screenshotId" value="@screenshot.ID" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">No screenshots uploaded yet.</p>
+                }
+
+                <hr />
+                <form method="post" asp-page-handler="Upload" asp-route-id="@Model.Application.ID" enctype="multipart/form-data">
+                    <div class="row align-items-end">
+                        <div class="col-md-8">
+                            <label class="form-label">Upload Screenshot</label>
+                            <input type="file" name="ScreenshotUpload" class="form-control" accept="image/jpeg,image/png,image/gif,image/webp" />
+                            <small class="text-muted">Max 5MB. JPEG, PNG, GIF, or WebP.</small>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-success">Upload</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 

@@ -20,6 +20,7 @@ public class SchoolAppTrackerContext : DbContext
     public DbSet<GradeLevel> GradeLevels => Set<GradeLevel>();
     public DbSet<ApplicationGradeLevel> ApplicationGradeLevels => Set<ApplicationGradeLevel>();
     public DbSet<ApplicationDepartment> ApplicationDepartments => Set<ApplicationDepartment>();
+    public DbSet<Screenshot> Screenshots => Set<Screenshot>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -58,6 +59,13 @@ public class SchoolAppTrackerContext : DbContext
             .WithMany(d => d.ApplicationDepartments)
             .HasForeignKey(ad => ad.DepartmentId)
             .OnDelete(DeleteBehavior.NoAction);
+
+        // Screenshots cascade delete
+        modelBuilder.Entity<Screenshot>()
+            .HasOne(s => s.Application)
+            .WithMany(a => a.Screenshots)
+            .HasForeignKey(s => s.ApplicationId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // Decimal precision
         modelBuilder.Entity<Application>()

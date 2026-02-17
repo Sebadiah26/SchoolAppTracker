@@ -34,6 +34,7 @@ public class ApplicationService : IApplicationService
             .Include(a => a.Category)
             .Include(a => a.ApplicationDepartments).ThenInclude(ad => ad.Department)
             .Include(a => a.ApplicationGradeLevels).ThenInclude(ag => ag.GradeLevel)
+            .Include(a => a.Screenshots)
             .FirstOrDefaultAsync(a => a.ID == id);
     }
 

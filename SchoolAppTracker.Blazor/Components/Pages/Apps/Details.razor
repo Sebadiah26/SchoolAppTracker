@@ -1,5 +1,8 @@
 @page "/apps/{Id:int}"
 @inject IApplicationService AppService
+@inject IScreenshotService ScreenshotService
+@inject IWebHostEnvironment Env
+@using SchoolAppTracker.Core.Services
 @rendermode InteractiveServer
 
 <PageTitle>Application Details</PageTitle>
@@ -119,6 +122,48 @@ else
                     <div class="card-body">@app.Notes</div>
                 </div>
             }
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <strong>Screenshots</strong>
+                    <span class="badge bg-secondary">@screenshots.Count</span>
+                </div>
+                <div class="card-body">
+                    @if (screenshots.Any())
+                    {
+                        <div class="row">
+                            @foreach (var screenshot in screenshots)
+                            {
+                                <div class="col-md-4 mb-3">
+                                    <div class="card">
+                                        <img src="@screenshot.FilePath" class="card-img-top" alt="@screenshot.FileName" />
+                                        <div class="card-body p-2">
+                                            <small class="text-muted">@screenshot.FileName (@(screenshot.FileSize / 1024) KB)</small>
+                                            <button class="btn btn-sm btn-outline-danger mt-1" @onclick="() => DeleteScreenshot(screenshot.ID)">Delete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No screenshots uploaded yet.</p>
+                    }
+
+                    <hr />
+                    <div class="row align-items-end">
+                        <div class="col-md-8">
+                            <label class="form-label">Upload Screenshot</label>
+                            <InputFile class="form-control" OnChange="HandleFileUpload" accept="image/jpeg,image/png,image/gif,image/webp" />
+                            <small class="text-muted">Max 5MB. JPEG, PNG, GIF, or WebP.</small>
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(uploadMessage))
+                    {
+                        <div class="alert @(uploadSuccess ? "alert-success" : "alert-danger") mt-2 mb-0">@uploadMessage</div>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 
@@ -132,10 +177,50 @@ else
 @code {
     [Parameter] public int Id { get; set; }
     private Application? app;
+    private List<Screenshot> screenshots = new();
+    private string? uploadMessage;
+    private bool uploadSuccess;
 
     protected override async Task OnInitializedAsync()
     {
         app = await AppService.GetByIdAsync(Id);
+        if (app != null)
+            screenshots = await ScreenshotService.GetByApplicationIdAsync(Id);
+    }
+
+    private async Task HandleFileUpload(InputFileChangeEventArgs e)
+    {
+        uploadMessage = null;
+        try
+        {
+            var file = e.File;
+            using var stream = new MemoryStream();
+            await file.OpenReadStream(5 * 1024 * 1024).CopyToAsync(stream);
+            stream.Position = 0;
+
+            var screenshot = await ScreenshotService.UploadAsync(Id, stream, file.Name, file.ContentType);
+            SchoolAppTracker.Core.Services.ScreenshotService.SaveFile(Env.WebRootPath, screenshot.FilePath, stream);
+
+            screenshots = await ScreenshotService.GetByApplicationIdAsync(Id);
+            uploadMessage = "Screenshot uploaded successfully.";
+            uploadSuccess = true;
+        }
+        catch (Exception ex)
+        {
+            uploadMessage = ex.Message;
+            uploadSuccess = false;
+        }
+    }
+
+    private async Task DeleteScreenshot(int screenshotId)
+    {
+        var screenshot = screenshots.FirstOrDefault(s => s.ID == screenshotId);
+        if (screenshot != null)
+        {
+            SchoolAppTracker.Core.Services.ScreenshotService.DeleteFile(Env.WebRootPath, screenshot.FilePath);
+            await ScreenshotService.DeleteAsync(screenshotId);
+            screenshots.RemoveAll(s => s.ID == screenshotId);
+        }
     }
 
     private string StatusBadge(AppStatus status) => status switch

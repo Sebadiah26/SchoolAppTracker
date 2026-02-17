@@ -43,4 +43,5 @@ public class Application
 
     public List<ApplicationGradeLevel> ApplicationGradeLevels { get; set; } = new List<ApplicationGradeLevel>();
     public List<ApplicationDepartment> ApplicationDepartments { get; set; } = new List<ApplicationDepartment>();
+    public List<Screenshot> Screenshots { get; set; } = new List<Screenshot>();
 }

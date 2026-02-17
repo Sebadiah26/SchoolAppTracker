@@ -21,6 +21,7 @@ public static class ServiceExtensions
         services.AddScoped<IApplicationService, ApplicationService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IDepartmentService, DepartmentService>();
+        services.AddScoped<IScreenshotService, ScreenshotService>();
 
         return services;
     }
