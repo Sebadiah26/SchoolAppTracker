@@ -16,15 +16,27 @@
 
 <h1>Edit Application</h1>
 
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     <input type="hidden" asp-for="Application.ID" />
     <input type="hidden" asp-for="Application.CreatedDate" />
+    <input type="hidden" asp-for="Application.IconPath" />
 
     <div class="row">
         <div class="col-md-8">
             <div class="card mb-3">
                 <div class="card-header"><strong>General Information</strong></div>
                 <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">App Icon</label>
+                        <div class="d-flex align-items-center gap-3">
+                            @if (!string.IsNullOrEmpty(Model.Application.IconPath))
+                            {
+                                <img src="@Model.Application.IconPath" alt="App Icon" style="width:48px;height:48px;object-fit:contain;border:1px solid #dee2e6;border-radius:4px;" />
+                            }
+                            <input type="file" name="IconUpload" class="form-control" accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml" />
+                        </div>
+                        <small class="text-muted">Upload a new icon to replace the current one.</small>
+                    </div>
                     <div class="mb-3">
                         <label asp-for="Application.Name" class="form-label"></label>
                         <input asp-for="Application.Name" class="form-control" />

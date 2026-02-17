@@ -5,6 +5,8 @@
 @inject NavigationManager Nav
 @using Microsoft.EntityFrameworkCore
 @inject SchoolAppTracker.Data.SchoolAppTrackerContext Context
+@inject IWebHostEnvironment Env
+@using SchoolAppTracker.Core.Services
 @rendermode InteractiveServer
 
 <PageTitle>Edit Application</PageTitle>
@@ -25,6 +27,17 @@ else
                 <div class="card mb-3">
                     <div class="card-header"><strong>General Information</strong></div>
                     <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">App Icon</label>
+                            <div class="d-flex align-items-center gap-3">
+                                @if (!string.IsNullOrEmpty(app.IconPath))
+                                {
+                                    <img src="@app.IconPath" alt="App Icon" style="width:48px;height:48px;object-fit:contain;border:1px solid #dee2e6;border-radius:4px;" />
+                                }
+                                <InputFile class="form-control" OnChange="HandleIconUpload" accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml" />
+                            </div>
+                            <small class="text-muted">Upload a new icon to replace the current one.</small>
+                        </div>
                         <div class="mb-3">
                             <label class="form-label">Name</label>
                             <InputText class="form-control" @bind-Value="app.Name" />
@@ -259,6 +272,25 @@ else
         categories = await CategoryService.GetAllAsync();
         departments = await DepartmentService.GetAllAsync();
         gradeLevels = await Context.GradeLevels.OrderBy(g => g.ID).ToListAsync();
+    }
+
+    private async Task HandleIconUpload(InputFileChangeEventArgs e)
+    {
+        if (app == null) return;
+        var file = e.File;
+        var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+        var storedName = $"{Guid.NewGuid()}{ext}";
+        var relativePath = $"/uploads/icons/{storedName}";
+
+        using var stream = new MemoryStream();
+        await file.OpenReadStream(5 * 1024 * 1024).CopyToAsync(stream);
+        stream.Position = 0;
+        ScreenshotService.SaveFile(Env.WebRootPath, relativePath, stream);
+
+        if (!string.IsNullOrEmpty(app.IconPath))
+            ScreenshotService.DeleteFile(Env.WebRootPath, app.IconPath);
+
+        app.IconPath = relativePath;
     }
 
     private void ToggleDept(int id, bool selected)

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using SchoolAppTracker.Core.Services;
 using SchoolAppTracker.Core.Services.Interfaces;
 using SchoolAppTracker.Data;
 using SchoolAppTracker.Data.Data;
@@ -14,13 +15,15 @@ public class EditModel : PageModel
     private readonly ICategoryService _categoryService;
     private readonly IDepartmentService _departmentService;
     private readonly SchoolAppTrackerContext _context;
+    private readonly IWebHostEnvironment _env;
 
-    public EditModel(IApplicationService applicationService, ICategoryService categoryService, IDepartmentService departmentService, SchoolAppTrackerContext context)
+    public EditModel(IApplicationService applicationService, ICategoryService categoryService, IDepartmentService departmentService, SchoolAppTrackerContext context, IWebHostEnvironment env)
     {
         _applicationService = applicationService;
         _categoryService = categoryService;
         _departmentService = departmentService;
         _context = context;
+        _env = env;
     }
 
     [BindProperty]
@@ -31,6 +34,9 @@ public class EditModel : PageModel
 
     [BindProperty]
     public List<int> SelectedGradeLevelIds { get; set; } = new();
+
+    [BindProperty]
+    public IFormFile? IconUpload { get; set; }
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
@@ -52,6 +58,22 @@ public class EditModel : PageModel
         {
             await PopulateViewBag();
             return Page();
+        }
+
+        if (IconUpload != null && IconUpload.Length > 0)
+        {
+            var ext = Path.GetExtension(IconUpload.FileName).ToLowerInvariant();
+            var storedName = $"{Guid.NewGuid()}{ext}";
+            var relativePath = $"/uploads/icons/{storedName}";
+
+            using var stream = IconUpload.OpenReadStream();
+            ScreenshotService.SaveFile(_env.WebRootPath, relativePath, stream);
+
+            // Delete old icon if exists
+            if (!string.IsNullOrEmpty(Application.IconPath))
+                ScreenshotService.DeleteFile(_env.WebRootPath, Application.IconPath);
+
+            Application.IconPath = relativePath;
         }
 
         // Remove existing join table entries

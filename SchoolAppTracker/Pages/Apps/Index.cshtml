@@ -36,6 +36,7 @@
 <table class="table table-striped">
     <thead>
         <tr>
+            <th style="width:50px;"></th>
             <th>Name</th>
             <th>Vendor</th>
             <th>Category</th>
@@ -52,6 +53,12 @@
         @foreach (var app in Model.Applications)
         {
             <tr>
+                <td>
+                    @if (!string.IsNullOrEmpty(app.IconPath))
+                    {
+                        <img src="@app.IconPath" alt="" style="width:32px;height:32px;object-fit:contain;" />
+                    }
+                </td>
                 <td>@app.Name</td>
                 <td>@app.VendorName</td>
                 <td>@app.Category?.Name</td>

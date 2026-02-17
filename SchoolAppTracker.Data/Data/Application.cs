@@ -6,6 +6,7 @@ public class Application
 {
     public int ID { get; set; }
     public string Name { get; set; } = string.Empty;
+    public string? IconPath { get; set; }
     public string? Description { get; set; }
     public string? VendorName { get; set; }
     public string? VendorContact { get; set; }
