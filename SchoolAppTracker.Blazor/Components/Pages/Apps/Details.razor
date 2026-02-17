@@ -135,7 +135,7 @@ else
                             {
                                 <div class="col-md-4 mb-3">
                                     <div class="card">
-                                        <img src="@screenshot.FilePath" class="card-img-top" alt="@screenshot.FileName" />
+                                        <img src="@screenshot.FilePath" class="card-img-top" alt="@screenshot.FileName" style="cursor:pointer;" @onclick="() => OpenModal(screenshot)" />
                                         <div class="card-body p-2">
                                             <small class="text-muted">@screenshot.FileName (@(screenshot.FileSize / 1024) KB)</small>
                                             <button class="btn btn-sm btn-outline-danger mt-1" @onclick="() => DeleteScreenshot(screenshot.ID)">Delete</button>
@@ -172,6 +172,23 @@ else
         <a href="/apps/@app.ID/delete" class="btn btn-danger">Delete</a>
         <a href="/apps" class="btn btn-outline-secondary">Back to List</a>
     </div>
+
+    @if (modalScreenshot != null)
+    {
+        <div class="modal fade show d-block" tabindex="-1" style="background-color:rgba(0,0,0,0.5);" @onclick="CloseModal">
+            <div class="modal-dialog modal-lg modal-dialog-centered" @onclick:stopPropagation="true">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">@modalScreenshot.FileName</h5>
+                        <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img src="@modalScreenshot.FilePath" class="img-fluid" alt="@modalScreenshot.FileName" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 }
 
 @code {
@@ -180,6 +197,7 @@ else
     private List<Screenshot> screenshots = new();
     private string? uploadMessage;
     private bool uploadSuccess;
+    private Screenshot? modalScreenshot;
 
     protected override async Task OnInitializedAsync()
     {
@@ -222,6 +240,9 @@ else
             screenshots.RemoveAll(s => s.ID == screenshotId);
         }
     }
+
+    private void OpenModal(Screenshot screenshot) => modalScreenshot = screenshot;
+    private void CloseModal() => modalScreenshot = null;
 
     private string StatusBadge(AppStatus status) => status switch
     {

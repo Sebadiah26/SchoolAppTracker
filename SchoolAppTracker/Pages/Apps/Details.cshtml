@@ -162,7 +162,9 @@
                         {
                             <div class="col-md-4 mb-3">
                                 <div class="card">
-                                    <img src="@screenshot.FilePath" class="card-img-top" alt="@screenshot.FileName" />
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#screenshotModal" onclick="document.getElementById('modalImage').src='@screenshot.FilePath'; document.getElementById('modalLabel').textContent='@screenshot.FileName';">
+                                        <img src="@screenshot.FilePath" class="card-img-top" alt="@screenshot.FileName" style="cursor:pointer;" />
+                                    </a>
                                     <div class="card-body p-2">
                                         <small class="text-muted">@screenshot.FileName (@(screenshot.FileSize / 1024) KB)</small>
                                         <form method="post" asp-page-handler="DeleteScreenshot" asp-route-id="@Model.Application.ID" class="mt-1">
@@ -202,4 +204,18 @@
     <a asp-page="/Apps/Edit" asp-route-id="@Model.Application.ID" class="btn btn-primary">Edit</a>
     <a asp-page="/Apps/Delete" asp-route-id="@Model.Application.ID" class="btn btn-danger">Delete</a>
     <a asp-page="/Apps/Index" class="btn btn-outline-secondary">Back to List</a>
+</div>
+
+<div class="modal fade" id="screenshotModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid" alt="Screenshot" />
+            </div>
+        </div>
+    </div>
 </div>
